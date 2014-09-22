@@ -17,14 +17,20 @@ Uses PostgreSQL/PostGIS database, configuration in `config.json`. Run:
 And execute the following query:
 
     CREATE VIEW osm_objects AS
-      SELECT osm_id, tags, way FROM planet_osm_point
-      UNION ALL
       SELECT osm_id, tags, way FROM planet_osm_line
       UNION ALL
-      SELECT osm_id, tags, way FROM planet_osm_polygon;
+      SELECT osm_id, tags, way FROM planet_osm_polygon
+      UNION ALL
+      SELECT osm_id, tags, way FROM planet_osm_point;
 
 ## Data files
 
 - `ns.json` - source: [NS API](http://www.ns.nl/api/home)
 - `parking.json`
 - `schools.json` - source: [schoolcijferlijst.nl](http://www.schoolcijferlijst.nl/)
+
+You can use the different data files by setting the file in the location hash:
+
+- [http://localhost:9292/#ns](http://localhost:9292/#ns)
+- [http://localhost:9292/#parking](http://localhost:9292/#parking)
+- [http://localhost:9292/#schools](http://localhost:9292/#schools)

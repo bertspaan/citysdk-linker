@@ -31,8 +31,10 @@ class CitySDK_Linker < Sinatra::Base
     features = []
 
     # Get all objects from view osm_objects which completely intersect with circle with radius <radius> m.
-    where = "ST_Contains(ST_Transform(Geometry(ST_Buffer(Geography(ST_Transform(ST_SetSRID(ST_Point(#{lon}, #{lat}), 4326), 4326)), #{radius})), 4326), way)"
-    dataset = DB[:osm_objects].select(:osm_id, :tags, Sequel.function(:ST_AsGeoJSON, :way).as(:geojson)).where(where).each do |row|
+    contains = "ST_Contains(ST_Transform(Geometry(ST_Buffer(Geography(ST_Transform(ST_SetSRID(ST_Point(#{lon}, #{lat}), 4326), 4326)), #{radius})), 4326), way)"
+    crosses = "ST_Crosses(ST_Transform(Geometry(ST_Buffer(Geography(ST_Transform(ST_SetSRID(ST_Point(#{lon}, #{lat}), 4326), 4326)), #{radius})), 4326), way)"
+
+    dataset = DB[:osm_objects].select(:osm_id, :tags, Sequel.function(:ST_AsGeoJSON, :way).as(:geojson)).where("(#{contains}) OR (#{crosses})").each do |row|
       features << {
         type: "Feature",
         id: row[:osm_id],

@@ -7,19 +7,96 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   </head>
   <body>
     <div id="map"></div>
+    <div id="sidebar">
+      <div id="wrapper">
+        <h1>CitySDK Linker</h1>
+        <h2>Data</h2>
+        <table id="table-data">
+        </table>
+        <h2>OpenStreetMap</h2>
+        <table id="table-osm">
+        </table>
+      </div>
+    </div>
     <script>
+    // Choose between "parking", "ns" and "schools"
+      var dataset = "parking";
+      if (location.hash.length > 0) {
+        dataset = location.hash.substring(1);
+      }
+
       var map = L.map('map');
       map.setView([52.37278, 4.90032], 12);
 
       var tileUrl = 'http://otile2.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png';
 
+      var dataMarkerOptions = {
+        radius: 7,
+        fillColor: "#ff7800",
+        color: "#000",
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.8
+      };
+
+      var osmMarkerOptions = {
+        radius: 4,
+        fillColor: "#0022ff",
+        color: "#000",
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.8
+      };
+
       var tileLayer = L.tileLayer(tileUrl, {
         attribution: 'Map © OpenStreetMap contributors',
-      	minZoom: 2
+      	minZoom: 10,
+        maxZoom: 19
       }).addTo(map);
+
+      function propertiesTable(table, feature) {
+        d3.select(table).selectAll('tr').remove();
+        var tr = d3.select(table).selectAll('tr')
+            .data(Object.keys(feature.properties))
+          .enter().append('tr');
+
+        tr.append('td').html(function(d) { return d; });
+        tr.append('td').html(function(d) { return feature.properties[d]; });
+      }
+
+      var osmLayer = L.geoJson(null, {
+        pointToLayer: function (feature, latlng) {
+          return L.circleMarker(latlng, osmMarkerOptions);
+        },
+        onEachFeature: function (feature, layer) {
+          layer.on('click', function (e) {
+            propertiesTable('#table-osm', feature);
+          });
+        }
+      }).addTo(map);
+
+      $.getJSON("data/" + dataset, function(data) {
+        var dataLayer = L.geoJson(data, {
+          pointToLayer: function (feature, latlng) {
+            return L.circleMarker(latlng, dataMarkerOptions);
+          },
+          onEachFeature: function (feature, layer) {
+            layer.on('click', function (e) {
+              propertiesTable('#table-data', feature);
+              $.getJSON("data/osm/" + feature.geometry.coordinates.reverse().join('/'), function(osm) {
+                osmLayer.clearLayers();
+                osmLayer.addData(osm);
+              });
+            });
+
+          }
+        }).addTo(map);
+      });
     </script>
   </body>
 </html>

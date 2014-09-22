@@ -15,17 +15,35 @@ body {
   background-color: white;
 }
 
-h1 {
+h1, h2 {
+  margin-bottom: 20px;
+}
 
+h2 {
+  margin-top: 20px;
 }
 
 #map {
-  right: 0px;
+  right: 400px;
   left: 0;
   height: 100%;
+  bottom: 0;
   position: absolute;
 }
 
+#sidebar {
+  right: 0px;
+  width: 400px;
+  height: 100%;
+  bottom: 0;
+  position: absolute;
+  overflow: scroll;
+}
+
+#wrapper {
+  padding: 20px;
+}
+
 body, a, a:visited {
-  color: white;
+  color: black;
 }
