@@ -5,6 +5,11 @@
   src: url('fonts/Edmondsans-Regular.otf')
 }
 
+* {
+	padding: 0;
+  margin: 0;
+}
+
 body {
   font-family: 'Edmondsans', sans-serif;
   background-color: white;
@@ -12,6 +17,13 @@ body {
 
 h1 {
 
+}
+
+#map {
+  right: 0px;
+  left: 0;
+  height: 100%;
+  position: absolute;
 }
 
 body, a, a:visited {
